@@ -194,31 +194,44 @@ public class RangeTest{
 		exampleRange.intersects(null);	
 	}
 	
+	// These tests were designed to kill some mutants
+	// so they are not exactly grounded in the most reason
+	// ---------------------------------------------------
+	
+	// Tests when the first parameter in intersects is <= this.lower
 	@Test
-	public void testIntersectsMutant() {
-	    // Create a test instance with lower bound 1 and upper bound 10
-	    double lower = 1.0;
-	    double upper = 10.0;
-	    Range range = new Range(lower, upper);
+	public void testIntersectsParam1LEQLower() {
+	    Range range = new Range(1, 10);
 
-	    // Test when b0 <= this.lower
-	    assertTrue(range.intersects(0.0, 5.0));  // Expected result: true
-	    assertFalse(range.intersects(0.0, 1.0));  // Expected result: false
-	    assertTrue(range.intersects(0.0, 11.0));  // Expected result: true
-
-	    // Test when b0 > this.lower
-	    assertTrue(range.intersects(5.0, 7.0));  // Expected result: true
-	    assertFalse(range.intersects(11.0, 12.0));  // Expected result: false
-	    assertFalse(range.intersects(10.0, 12.0));  // Expected result: false
-	    assertFalse(range.intersects(10.0, 11.0));  // Expected result: true
-	    
-	    // Test with b0 = this.upper
-	    assertFalse(range.intersects(10.0, 12.0));  // Expected result: false
-	    
+	    assertTrue(range.intersects(0.0, 5.0));
+	    assertFalse(range.intersects(0.0, 1.0));
+	    assertTrue(range.intersects(0.0, 11.0));
+	}
+	
+	// Tests when the first parameter in intersects is > this.lower
+	@Test
+	public void testIntersectsParam1GELower() {
+		Range range = new Range(1, 10);
+		
+		assertTrue(range.intersects(5.0, 7.0));
+	    assertFalse(range.intersects(11.0, 12.0));
+	    assertFalse(range.intersects(10.0, 12.0));
+	    assertFalse(range.intersects(10.0, 11.0));
+	}
+	
+	// Tests when the first parameter in intersects is = this.lower
+	// and other test cases close to the boundaries of the range
+	@Test
+	public void testIntersectsParam1Misc() {
+		Range range = new Range(1, 10);
+		
+		assertFalse(range.intersects(10.0, 12.0));
 	    assertFalse(range.intersects( 1.2, 1.1));
 	    assertTrue(range.intersects( 9.9, 11));
 	}
 	
+	// Tests intersection between a range and a point
+	// Was created to kill certain mutants
 	@Test
 	public void testIntersectsPoint() {
 		assertFalse(exampleRange.intersects(-6,-6));
