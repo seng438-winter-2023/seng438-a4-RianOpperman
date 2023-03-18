@@ -1102,5 +1102,43 @@ public class DataUtilitiesTest extends DataUtilities {
 		     }); 
 		     int[] validCols = {0, 1};
 		     double result = DataUtilities.calculateRowTotal(values, 50);
-		 }	
+		 }
+		 
+//------------------------------------mutation testing----------------------------------------
+		 @Test
+		 public void mutEqualForLoop() {
+			double[][]a = {{1.0, 2.0}, {3.0, 4.0}};
+			double[][] b = {{1.0, 2.0}, {3.0, 4.0}, {3.0, 4.0}};
+			boolean expected = false;
+			boolean result = equal(a, b);
+			assertEquals(expected, result);
+		  }  
+
+		 @Test
+		 public void mutEqual() {
+			 double[][] a = {{1.0, 2.0}, {3.0, 4.0}};
+			 double[][] b = {{1.0, 2.0}};
+			 boolean expected = false;
+			boolean result = equal(a, b);
+			assertEquals(expected, result);
+		 }  
+		 
+		 @Test
+		 public void mutEqualDifferntLoop() {
+			double[][] a = {{1.0, 20.0}, {3.0, 4.0}};
+			double[][] b = {{1.0, 2.0}, {3.0, 4.0}};
+			boolean expected = false;
+			boolean result = equal(a, b);
+			assertEquals(expected, result);
+		 }
+		 
+		 @Test
+		 public void mutEquavall() {
+			 double[][] a = {{1.0, 2.0}, {3.0, 4.0}};
+			 double[][] b = {{1.0, 2.0}};
+			 boolean expected = false;
+			boolean result = equal(a, b);
+			assertEquals(expected, result);
+		 } 
+		 	 
 }
