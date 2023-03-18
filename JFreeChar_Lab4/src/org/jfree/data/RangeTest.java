@@ -59,6 +59,20 @@ public class RangeTest{
 		assertEquals("Retrieved central value is incorrect", 
 				0, exampleRange.getCentralValue(),.000000001d);
 	}
+	
+	@Test
+	public void getCentralValueTestNegativeRange() {
+		Range testRange = new Range(-10, -5);
+		assertEquals("Retrieved central value is incorrect", 
+				-7.5, testRange.getCentralValue(),.000000001d);
+	}
+	
+	@Test
+	public void getCentralValueTestPositiveRange() {
+		Range testRange = new Range(5, 10);
+		assertEquals("Retrieved central value is incorrect", 
+				7.5, testRange.getCentralValue(),.000000001d);
+	}
 
 	// -----------------------------------------------------------
 	// contains()
@@ -66,14 +80,28 @@ public class RangeTest{
 	// Contains() method is tested by sending a value which is below range
 	@Test
 	public void testContainsBelowRange() {
-		double testValue = -6;
+		double testValue = -10;
+		assertFalse(exampleRange.contains(testValue));
+	}
+	
+	// Contains method is tested by sending a value which is just below the lower range
+	@Test
+	public void testContainsBelowLowerBoundRange() {
+		double testValue = -5.1;
 		assertFalse(exampleRange.contains(testValue));
 	}
 
 	// Contains() method is tested by sending a value which is above range
 	@Test
 	public void testContainsAboveRange() {
-		double testValue = 6;
+		double testValue = 10;
+		assertFalse(exampleRange.contains(testValue));
+	}
+	
+	// Contains() method is tested by sending a value which is just above upper range
+	@Test
+	public void testContainsAboveUpperRange() {
+		double testValue = 5.1;
 		assertFalse(exampleRange.contains(testValue));
 	}
 	
@@ -81,6 +109,20 @@ public class RangeTest{
 	@Test
 	public void testContainsInRange() {
 		double testValue1 = 3;
+		assertTrue(exampleRange.contains(testValue1));	
+	}
+	
+	// Contains() method is tested by sending a value which is within the range
+	@Test
+	public void testContainsOnUpperBound() {
+		double testValue1 = 5;
+		assertTrue(exampleRange.contains(testValue1));	
+	}
+	
+	// Contains() method is tested by sending a value which is within the range
+	@Test
+	public void testContainsOnLowerBound() {
+		double testValue1 = -5;
 		assertTrue(exampleRange.contains(testValue1));	
 	}
 
@@ -92,7 +134,22 @@ public class RangeTest{
 	public void testIntersectBelowSpecifiedRange() {
 		assertFalse(exampleRange.intersects(6, 10));
 	}
-
+	
+	@Test
+	public void testIntersectBelowSpecifiedRangeNegativeUpper() {
+		assertFalse(exampleRange.intersects(6, -10));
+	}
+	
+	@Test
+	public void testIntersectBelowSpecifiedRangeNegativeLower() {
+		assertTrue(exampleRange.intersects(-6, 10));
+	}
+	
+	@Test
+	public void testIntersectBelowSpecifiedRangeNegative() {
+		assertFalse(exampleRange.intersects(-10, -6));
+		assertTrue(exampleRange.intersects(-10, 0));
+	}
 	
 	@Test
 	public void testIntersectAtLowervSpecifiedRange() {
@@ -129,7 +186,6 @@ public class RangeTest{
 	public void testIntersectAtUpperGivenRange() {
 		Range SpecifiedRange = new Range(-10,-4);
 		assertTrue(exampleRange.intersects(SpecifiedRange));
-			
 	}
 	
 	@Test 
@@ -137,6 +193,42 @@ public class RangeTest{
 		exception.expect(NullPointerException.class);
 		exampleRange.intersects(null);	
 	}
+	
+	@Test
+	public void testIntersectsMutant() {
+	    // Create a test instance with lower bound 1 and upper bound 10
+	    double lower = 1.0;
+	    double upper = 10.0;
+	    Range range = new Range(lower, upper);
+
+	    // Test when b0 <= this.lower
+	    assertTrue(range.intersects(0.0, 5.0));  // Expected result: true
+	    assertFalse(range.intersects(0.0, 1.0));  // Expected result: false
+	    assertTrue(range.intersects(0.0, 11.0));  // Expected result: true
+
+	    // Test when b0 > this.lower
+	    assertTrue(range.intersects(5.0, 7.0));  // Expected result: true
+	    assertFalse(range.intersects(11.0, 12.0));  // Expected result: false
+	    assertFalse(range.intersects(10.0, 12.0));  // Expected result: false
+	    assertFalse(range.intersects(10.0, 11.0));  // Expected result: true
+	    
+	    // Test with b0 = this.upper
+	    assertFalse(range.intersects(10.0, 12.0));  // Expected result: false
+	    
+	    assertFalse(range.intersects( 1.2, 1.1));
+	    assertTrue(range.intersects( 9.9, 11));
+	}
+	
+	@Test
+	public void testIntersectsPoint() {
+		assertFalse(exampleRange.intersects(-6,-6));
+		
+		Range range = new Range(-5, -4.8);
+		assertTrue(range.intersects(-4.9, 10));
+		
+		assertTrue(exampleRange.intersects(0, 0));
+	}
+
 	
 	// -----------------------------------------------------------
 	// constrain()
@@ -158,10 +250,35 @@ public class RangeTest{
 	//The Constraint() method is test when a value above the range 
 	@Test
 	public void testConstraintAboveRange() {
-		double testValue = 5;
+		double testValue = 6;
 		assertEquals("Return value should be 5", 5,
 			exampleRange.constrain(testValue), 0.000000001d);	
 	}
+	
+	//The Constraint() method is test when a value in the range 
+	@Test
+	public void testConstraintJustBelowRange() {
+		double testValue = -5.1;
+		assertEquals("Return value should be 3", -5,
+			exampleRange.constrain(testValue), 0.000000001d);		
+	}
+	
+	//The Constraint() method is test when a value above the range 
+	@Test
+	public void testConstraintJustAboveRange() {
+		double testValue = 5.1;
+		assertEquals("Return value should be 5", 5,
+			exampleRange.constrain(testValue), 0.000000001d);	
+	}
+	
+	@Test
+	public void testConstraintPoint() {
+		Range range = new Range(10,10);
+		double testValue = 5.1;
+		assertEquals("Return value should be 10.0", 10.0,
+			range.constrain(testValue), 0.000000001d);	
+	}
+	
 
 	// -----------------------------------------------------------
 	// comnbine()
@@ -355,6 +472,24 @@ public class RangeTest{
 		Range ret = Range.combineIgnoringNaN(exampleRange, range2);
 		assertEquals(ret, new Range(-5, 20));
 	}
+	
+	@Test
+	public void testCombineIgnoringNaNRange1UpperNaNRange2UpperNaN(){
+		Range range2 = new Range(5, Double.NaN);
+		Range range1 = new Range(4, Double.NaN);
+		Range ret = Range.combineIgnoringNaN(range1, range2);
+		assertEquals(4, ret.getLowerBound(), 0.0000001d);
+		assertTrue(Double.isNaN(ret.getUpperBound()));
+	}
+	
+	@Test
+	public void testCombineIgnoringNaNRange1LowerNaNRange2LowerNaN(){
+		Range range2 = new Range(Double.NaN, 10);
+		Range range1 = new Range(Double.NaN, 9);
+		Range ret = Range.combineIgnoringNaN(range1, range2);
+		assertEquals(10, ret.getUpperBound(), 0.0000001d);
+		assertTrue(Double.isNaN(ret.getLowerBound()));
+	}
 
 	// -----------------------------------------------------------
 	// expandToInclude()
@@ -519,7 +654,10 @@ public class RangeTest{
 	@Test
 	public void testShift(){
 		Range ret = Range.shift(new Range(0, 10), 10);
-		assertEquals(ret, new Range(10, 20));
+		assertEquals(new Range(10, 20), ret);
+		
+		ret = Range.shift(new Range(-2, -1), 5);
+		assertEquals(new Range(0.0, 0.0), ret);
 	}
 
 	// tests shift with zero corssing set to true and range is null
@@ -561,6 +699,16 @@ public class RangeTest{
 		Range ret = Range.shift(exampleRange, 10, true);
 		assertEquals(ret, new Range(5, 15));
 	}
+	
+	@Test
+	public void testShiftNoZeroCrossing() {
+		Range range = new Range(-0.9, 1.0);
+		Range ret = Range.shift(range,  -5, false);
+		assertEquals(new Range(-5.9, 0), ret);
+		
+		ret = Range.shift(range, 1);
+		assertEquals(new Range(0, 2.0), ret);
+	}
 
 	// -----------------------------------------------------------
 	// scale()
@@ -591,10 +739,20 @@ public class RangeTest{
 
 	// tests scale when the factor is less than 0,
 	// should throw an IllegalArgumentException
-	@Test
-	public void testScaleFactorLessThan0() throws IllegalArgumentException{
-		exception.expect(IllegalArgumentException.class);
+	@Test (expected = IllegalArgumentException.class)
+	public void testScaleFactorLessThan0(){
 		Range ret = Range.scale(exampleRange, -1);
+	}
+	
+	@Test (expected = IllegalArgumentException.class)
+	public void testScaleFactorMutation(){
+		Range ret = Range.scale(exampleRange, -0.5);
+	}
+	
+	@Test
+	public void testScaleFactorEqualTo0(){
+		Range ret = Range.scale(exampleRange, 0);
+		assertEquals(new Range(0, 0), ret);
 	}
 
 	// tests scale when range is valid and factor is valid
@@ -602,6 +760,10 @@ public class RangeTest{
 	public void testScale(){
 		Range ret = Range.scale(exampleRange, 2);
 		assertEquals(ret, new Range(-10, 10));
+		
+		ret = Range.scale(exampleRange, 0.5);
+		assertEquals(new Range(-2.5, 2.5), ret);
+		
 	}
 
 	// -----------------------------------------------------------
@@ -632,11 +794,42 @@ public class RangeTest{
 		Range test = new Range(5, -1);
 	}
 	
+	@Test
+	public void testConstructorExceptionoMessage() {
+		boolean thrown = false;
+		Range test;
+		try {
+			test = new Range(5, -1);
+		}
+		catch(IllegalArgumentException e) {
+			assertEquals("Range(double, double): require lower (5.0) <= upper (-1.0).", e.getMessage());
+			thrown = true;
+		}
+		
+		assertTrue(thrown);
+	}
+	
+	@Test
+	public void testConstructor() {
+		Range test = new Range(-4, 4);
+		assertEquals(new Range(-4, 4), test);
+		assertEquals(-4, test.getLowerBound(), 0.0000001d);
+		assertEquals(4, test.getUpperBound(), 0.0000001d);
+	}
+	
 	// tests the hashing function, hash was calculated before hand and used 
 	// code as a guide to determining the hash
 	@Test
 	public void testHash() {
-		assertEquals(exampleRange.hashCode(), 39321600);
+		assertEquals(39321600, exampleRange.hashCode());
+		Range range = new Range(-5, -3);
+		assertEquals(-2108948480, range.hashCode());
+		range = new Range(5, 10);
+		assertEquals(-2107113472, range.hashCode());
+		range = new Range(Double.NaN, Double.NaN);
+		assertEquals(-15728640, range.hashCode());
+		range = new Range(1, 1);
+		assertEquals(2116026368, range.hashCode());
 	}
 
 	// tests the equals method on various objects and ranges
@@ -655,6 +848,12 @@ public class RangeTest{
 		assertFalse(exampleRange.equals(testRange));
 	}
 	
+	
+	// Tests toString for various Range classes
+	@Test
+	public void testToString() {
+		assertEquals("Range[-5.0,5.0]", exampleRange.toString());
+	}
 	
 	@After
 	public void tearDown() throws Exception {exampleRange = null;}
